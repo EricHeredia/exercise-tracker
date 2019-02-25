@@ -5,7 +5,7 @@ const bodyParser = require('body-parser')
 const cors = require('cors')
 
 const mongoose = require('mongoose')
-mongoose.connect(process.env.MLAB_URI || 'mongodb://localhost/exercise-track' )
+mongoose.connect(process.env.MONGODB_URI || "mongodb://EricHeredia:asdf1234@ds213832.mlab.com:13832/cloudbase", {useMongoClient: true} );
 
 app.use(cors())
 
@@ -18,6 +18,55 @@ app.get('/', (req, res) => {
   res.sendFile(__dirname + '/views/index.html')
 });
 
+// test
+app.get('/api/test', (req, res) => {
+  res.send('Working!')
+})
+
+//------------------------------------------------------------
+
+var Schema = mongoose.Schema
+var accSchema = new Schema({
+  username: String,
+  exercises: Object
+})
+var UsrAcc = mongoose.model('UsrAcc', accSchema)
+
+// Create new user
+app.post('/api/exercise/new-user', (req, res) => {
+  var username = req.body.username
+  res.send(username)
+
+  var usrAcc = new UsrAcc({
+    username: username
+  })
+
+  usrAcc.save()
+})
+
+// Add exercises
+app.post('/api/exercise/add', (req, res) => {
+  var userId = req.body.userId
+  var description = req.body.description
+  var duration = req.body.duration
+  var date = req.body.date
+
+  res.send(userId + ' ' + description + ' ' + duration + ' ' + date)
+})
+
+// Get logs
+app.get('/api/exercise/log?:usrId', (req, res) => {
+  var usrId = req.query
+
+  UsrAcc.find(usrId[0], (err, data) => {
+    res.json(data)
+  })
+})
+
+
+
+
+//------------------------------------------------------------
 
 // Not found middleware
 app.use((req, res, next) => {
