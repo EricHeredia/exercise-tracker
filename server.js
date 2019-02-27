@@ -148,10 +148,11 @@ app.get('/api/exercise/log', (req, res) => {
           log = log.splice(0, limit)
         }
       } else {
+        log = data.exercises.sort((a, b) => {
+          return new Date(a.date) - new Date(b.date)
+        })
         if(limit) {
-          log = data.exercises.sort().splice(0, limit)
-        } else {
-          log = data.exercises.sort()
+          log.splice(0, limit)
         }
       }
 
