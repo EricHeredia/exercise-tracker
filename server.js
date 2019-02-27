@@ -1,6 +1,7 @@
 const express = require('express')
 const app = express()
 const bodyParser = require('body-parser')
+const shortid = require('shortid')
 
 const cors = require('cors')
 
@@ -23,25 +24,52 @@ app.get('/api/test', (req, res) => {
   res.send('Working!')
 })
 
-//------------------------------------------------------------
-
+// Create schema and subschema
 var Schema = mongoose.Schema
+var subSchema = new Schema({
+  description: String,
+  duration: String,
+  date: String
+}, {_id: false})
 var accSchema = new Schema({
   username: String,
-  exercises: Object
+  _id: {
+    'type': String,
+    'default': shortid.generate
+  },
+  exercises: [subSchema]
 })
 var UsrAcc = mongoose.model('UsrAcc', accSchema)
 
 // Create new user
 app.post('/api/exercise/new-user', (req, res) => {
   var username = req.body.username
-  res.send(username)
+  
+  // Check if username taken
+  UsrAcc.findOne({username: username}, (err, data) => {
+    if(data) {
+      res.send('Username already taken')
+    } else {
 
-  var usrAcc = new UsrAcc({
-    username: username
+      // Create username
+      var usrAcc = new UsrAcc({
+        username: username
+      })
+    
+      usrAcc.save()
+      res.json({username: username, _id: usrAcc.id})
+    }
   })
+})
 
-  usrAcc.save()
+// Get logs form
+app.post('/api/exercise/get-log', (req, res) => {
+  newLink = '/api/exercise/log?userId='
+  newLink += req.body.lUserId
+  if (req.body.lFrom) { newLink += '&from=' + req.body.lFrom }
+  if (req.body.lTo) { newLink += '&to=' + req.body.lTo }
+  if (req.body.lLimit) { newLink += '&limit=' + req.body.lLimit }
+  res.redirect(newLink)
 })
 
 // Add exercises
@@ -50,23 +78,91 @@ app.post('/api/exercise/add', (req, res) => {
   var description = req.body.description
   var duration = req.body.duration
   var date = req.body.date
-
-  res.send(userId + ' ' + description + ' ' + duration + ' ' + date)
+  if (date === '') { date = new Date().toDateString() }
+  var formatDate = new Date(date + ' ').toDateString()
+  
+  if (userId == "" || description == "" || duration == "") {
+    // required fields not filled
+    res.send('Please fill all required fields.')
+  } else {
+    if (formatDate === 'Invalid Date') {
+      res.send('Invalid Date, Please enter a correct date!')
+    } else {
+      var newExercise = {date: formatDate, description: description, duration: duration}
+    
+      UsrAcc.findByIdAndUpdate(userId, {$push: {exercises: newExercise}}, (err, user) => {
+        if(err){
+          console.log(err)
+        }
+        if (user === null) {
+          res.send('User not found!')
+        } else {
+          res.json({username: user.username, description: description, duration: duration, _id: userId, date: formatDate})
+        }
+      })
+    }
+  }
 })
 
 // Get logs
-app.get('/api/exercise/log?:usrId', (req, res) => {
-  var usrId = req.query
+app.get('/api/exercise/log', (req, res) => {
+  var usrId = req.query.userId
+  var from = req.query.from
+  var to = req.query.to
+  var limit = req.query.limit
 
-  UsrAcc.find(usrId[0], (err, data) => {
-    res.json(data)
+  UsrAcc.findById(usrId, (err, data) => {
+    // Check if valid user Id
+    if (data === null){
+      res.send('User Id not found!')
+    } else {
+
+      // Build log output
+      var logOutput = {}
+      logOutput._id = usrId
+      logOutput.username = data.username
+      var log = []
+
+      if (from || to) {
+        log = data.exercises
+        if(from) { 
+          logOutput.from = new Date(from + ' ').toDateString()
+          log = log.filter((exercise) => {
+            if (new Date(exercise.date) >= new Date(logOutput.from)) {
+              return exercise
+            }
+          })
+        }
+        if(to) { 
+          logOutput.to = new Date(to + ' ').toDateString()
+          log = log.filter((exercise) => {
+            if (new Date(exercise.date) <= new Date(logOutput.to)) {
+              return exercise
+            }
+          })
+          log.sort((a, b) => {
+            return new Date(a.date) - new Date(b.date)
+          })
+        }
+        if(limit) {
+          log = log.splice(0, limit)
+        }
+      } else {
+        if(limit) {
+          log = data.exercises.sort().splice(0, limit)
+        } else {
+          log = data.exercises.sort()
+        }
+      }
+
+      logOutput.count = log.length
+      logOutput.log = log
+
+
+      res.json(logOutput)
+    }
   })
 })
-
-
-
-
-//------------------------------------------------------------
 
 // Not found middleware
 app.use((req, res, next) => {
