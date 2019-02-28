@@ -80,10 +80,14 @@ app.post('/api/exercise/add', (req, res) => {
   var date = req.body.date
   if (date === '') { 
     var dOff = new Date().getTimezoneOffset()
+    console.log(dOff)
     var newDate = new Date() + dOff
+    console.log(newDate)
     date = new Date(newDate).toDateString() 
+    console.log(date)
   } else {
     date = new Date(date + ' ').toDateString()
+    console.log(date)
   }
   
   if (userId == "" || description == "" || duration == "") {
