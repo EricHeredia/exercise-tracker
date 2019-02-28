@@ -82,8 +82,8 @@ app.post('/api/exercise/add', (req, res) => {
     var newDate = new Date()
     console.log(newDate)
     date = new Date(newDate.getTime() - newDate.getTimezoneOffset() * 60000)
-    date = date.toDateString()
-    console.log(date + ' ')
+    date = new Date(date + ' ').toDateString()
+    console.log(date)
   } else {
     date = new Date(date + ' ').toDateString()
   }
