@@ -80,7 +80,7 @@ app.post('/api/exercise/add', (req, res) => {
   var date = req.body.date
   if (date === '') { 
     var newDate = new Date()
-    date = new Date(newDate + ' UTC').toDateString()
+    date = new Date(newDate + ' UTC ').toDateString()
     console.log(date)
   } else {
     date = new Date(date + ' ').toDateString()
