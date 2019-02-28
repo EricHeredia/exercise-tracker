@@ -81,9 +81,9 @@ app.post('/api/exercise/add', (req, res) => {
   if (date === '') { 
     //var dOff = new Date().getTimezoneOffset()
     //console.log(dOff)
-    //var newDate = new Date() - dOff
+    var newDate = new Date()
     //console.log(newDate)
-    date = new Date(newDate).toDateString() + ' UTC'
+    date = new Date(newDate + ' UTC').toDateString()
     console.log(date)
   } else {
     date = new Date(date + ' ').toDateString()
