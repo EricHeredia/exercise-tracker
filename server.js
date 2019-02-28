@@ -82,18 +82,18 @@ app.post('/api/exercise/add', (req, res) => {
     var dOff = new Date().getTimezoneOffset()
     var newDate = new Date() + dOff
     date = new Date(newDate).toDateString() 
+  } else {
+    date = new Date(date + ' ').toDateString()
   }
-  console.log(date)
-  var formatDate = new Date(date + ' ').toDateString()
   
   if (userId == "" || description == "" || duration == "") {
     // required fields not filled
     res.send('Please fill all required fields.')
   } else {
-    if (formatDate === 'Invalid Date') {
+    if (date === 'Invalid Date') {
       res.send('Invalid Date, Please enter a correct date!')
     } else {
-      var newExercise = {date: formatDate, description: description, duration: duration}
+      var newExercise = {date: date, description: description, duration: duration}
     
       UsrAcc.findByIdAndUpdate(userId, {$push: {exercises: newExercise}}, (err, user) => {
         if(err){
@@ -102,7 +102,7 @@ app.post('/api/exercise/add', (req, res) => {
         if (user === null) {
           res.send('User not found!')
         } else {
-          res.json({username: user.username, description: description, duration: duration, _id: userId, date: formatDate})
+          res.json({username: user.username, description: description, duration: duration, _id: userId, date: date})
         }
       })
     }
