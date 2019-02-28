@@ -81,7 +81,7 @@ app.post('/api/exercise/add', (req, res) => {
   if (date === '') { 
     var newDate = new Date()
     console.log(newDate)
-    date = new Date(newDate).toDateString()
+    date = newDate.toDateString()
     console.log(date)
   } else {
     date = new Date(date + ' ').toDateString()
