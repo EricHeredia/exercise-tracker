@@ -89,7 +89,7 @@ app.post('/api/exercise/add', (req, res) => {
     // console.log(date)
     // date = new Date(date).toDateString()
     // console.log(date)
-    date = getLocalTime.getLocal()
+    date = getLocalTime.newNewDate
   } else {
     date = new Date(date + ' ').toDateString()
   }

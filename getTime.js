@@ -8,4 +8,7 @@ var getLocal = function() {
   return date
 }
 
+var newNewDate = date
+
 exports.getLocal = getLocal
+exports.newNewDate = newNewDate
