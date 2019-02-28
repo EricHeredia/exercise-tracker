@@ -79,15 +79,11 @@ app.post('/api/exercise/add', (req, res) => {
   var duration = req.body.duration
   var date = req.body.date
   if (date === '') { 
-    //var dOff = new Date().getTimezoneOffset()
-    //console.log(dOff)
     var newDate = new Date()
-    //console.log(newDate)
     date = new Date(newDate + ' UTC').toDateString()
     console.log(date)
   } else {
     date = new Date(date + ' ').toDateString()
-    console.log(date)
   }
   
   if (userId == "" || description == "" || duration == "") {
