@@ -79,11 +79,11 @@ app.post('/api/exercise/add', (req, res) => {
   var duration = req.body.duration
   var date = req.body.date
   if (date === '') { 
-    var dOff = new Date().getTimezoneOffset()
-    console.log(dOff)
-    var newDate = new Date() + dOff
-    console.log(newDate)
-    date = new Date(newDate).toDateString() 
+    //var dOff = new Date().getTimezoneOffset()
+    //console.log(dOff)
+    //var newDate = new Date() - dOff
+    //console.log(newDate)
+    date = new Date(newDate).toDateString() + ' UTC'
     console.log(date)
   } else {
     date = new Date(date + ' ').toDateString()
