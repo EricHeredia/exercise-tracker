@@ -2,7 +2,6 @@ const express = require('express')
 const app = express()
 const bodyParser = require('body-parser')
 const shortid = require('shortid')
-const getLocalTime = require('./getTime')
 
 const cors = require('cors')
 
@@ -80,16 +79,9 @@ app.post('/api/exercise/add', (req, res) => {
   var duration = req.body.duration
   var date = req.body.date
   if (date === '') { 
-    // var newDate = new Date()
-    // console.log(newDate)
-    // console.log(newDate.getTime())
-    // console.log(newDate.getTimezoneOffset())
-    // console.log(newDate.getTime() + ' - ' + newDate.getTimezoneOffset() + ' * 60000')
-    // date = new Date(newDate.getTime() - newDate.getTimezoneOffset() * 60000)
-    // console.log(date)
-    // date = new Date(date).toDateString()
-    // console.log(date)
-    date = getLocalTime.newNewDate
+    var newDate = new Date()
+    date = new Date(newDate.getTime() - newDate.getTimezoneOffset() * 60000)
+    date = new Date(date).toDateString()
   } else {
     date = new Date(date + ' ').toDateString()
   }
